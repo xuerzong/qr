@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+:root {
+  font-family: Nunito Sans, Noto Sans SC, sans-serif;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+}
