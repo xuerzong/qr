@@ -6,7 +6,7 @@ export const DecodingLength = () => {
   const { qr } = useQRCode()
   return (
     <>
-      <Components.h3>解码长度（Decoding Length）</Components.h3>
+      <Components.h3>解码长度</Components.h3>
       <Components.p>
         二维码的解码长度是指二维码中存储的信息量，通常以字节为单位。不同的二维码版本和纠错级别会影响解码长度。了解解码长度对于设计和生成二维码非常重要，以确保二维码能够容纳所需的信息。
       </Components.p>

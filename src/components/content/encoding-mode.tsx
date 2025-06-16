@@ -1,11 +1,20 @@
 import Components from '..'
 import { QRCodeDecoder } from '../qr/qr-code-decoder'
-import { QRCodeMask } from '../qr/qr-mask'
+import { useQRCode } from '../qr/qr-code-provider'
+
+const decodingModes: Record<string, string> = {
+  '0001': '数字模式',
+  '0010': '字母数字模式',
+  '0100': '字节模式',
+  '0111': 'ECI 模式',
+  '1000': 'Kanji 模式',
+}
 
 export const EncodingMode = () => {
+  const { qr } = useQRCode()
   return (
     <>
-      <Components.h3>编码模式（Decoding Mode）</Components.h3>
+      <Components.h3>编码模式</Components.h3>
       <Components.p>
         二维码的解码模式指的是二维码在被扫描时所采用的解码方式。不同的解码模式可以影响二维码的解析速度和准确性。常见的解码模式包括自动模式、手动模式等，适用于不同的应用场景。
       </Components.p>
@@ -57,6 +66,13 @@ export const EncodingMode = () => {
         ]}
         paths={['decodingMode', 'readOrder']}
       />
+      <Components.p>
+        当前编码模式为
+        <Components.strong>
+          {decodingModes[qr.decodingMode]}（{qr.decodingMode}）
+        </Components.strong>
+        。
+      </Components.p>
     </>
   )
 }

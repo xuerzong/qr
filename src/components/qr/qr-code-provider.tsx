@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react'
 import { Position } from './utils'
 import { QRCode } from '@/lib/qr'
+import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
 interface QRCodeContextState {
   qr: QRCode
@@ -20,16 +21,15 @@ const QRCodeContext = React.createContext<QRCodeContextState | null>(null)
 export const QRCodeProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [QRCodeValue, setQRCodeValue] = useState('Hello world!'.repeat(1))
   const [xorMask, setXorMask] = useState(false)
-
+  const [debounceQRCodeValue] = useDebounce(QRCodeValue, 500)
   const qr = useMemo(() => {
-    return new QRCode(QRCodeValue)
-  }, [QRCodeValue])
+    return new QRCode(debounceQRCodeValue)
+  }, [debounceQRCodeValue])
 
   const cells = useMemo(() => {
     return qr.cells
   }, [qr])
 
-  console.log(qr.qr.mask)
   // @ts-ignore
   const value: QRCodeContextState = {
     qr,

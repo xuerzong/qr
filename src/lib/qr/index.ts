@@ -46,7 +46,7 @@ export class QRCode {
   get decodingMode(): string {
     return this.traversalRecord
       .slice(0, 4)
-      .map((i) => i.order)
+      .map((i) => i.xorMaskValue)
       .join('')
   }
 

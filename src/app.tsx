@@ -14,9 +14,11 @@ import { Separators } from './components/content/separators'
 import { TimingPatterns } from './components/content/timing-patterns'
 import { VersionInformation } from './components/content/version-information'
 import { QRCodeEditor } from './components/qr/qr-code-editor'
-import { QRCodeProvider } from './components/qr/qr-code-provider'
+import { QRCodeProvider, useQRCode } from './components/qr/qr-code-provider'
 
-export const App = () => {
+const Component = () => {
+  const { qr } = useQRCode()
+  const isByteMode = qr.decodingMode === '0100'
   return (
     <QRCodeProvider>
       <main className="max-w-screen-md mx-auto pb-16">
@@ -84,8 +86,12 @@ export const App = () => {
           <Components.h2>二维码解剖</Components.h2>
           <ReadingOrder />
           <EncodingMode />
-          <DecodingLength />
-          <DecodingContent />
+          {isByteMode && (
+            <>
+              <DecodingLength />
+              <DecodingContent />
+            </>
+          )}
           <ErrorCorrection />
           <Other />
         </section>
@@ -106,6 +112,14 @@ export const App = () => {
           </Components.p>
         </section>
       </main>
+    </QRCodeProvider>
+  )
+}
+
+export const App = () => {
+  return (
+    <QRCodeProvider>
+      <Component />
     </QRCodeProvider>
   )
 }

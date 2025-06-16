@@ -21,12 +21,12 @@ export const Other = () => {
       </Components.p>
 
       <Components.p>
-        艺术二维码是将二维码与艺术设计相结合的形式，通常用于广告、宣传和品牌推广。艺术二维码在设计时需要确保二维码的核心功能不受影响，即仍然能够被扫描设备正确识别和解码。
+        艺术二维码是将二维码与艺术设计相结合的形式，通过保留二维码的底层技术逻辑（定位、编码、纠错），将数据模块转化为艺术化的视觉符号，既能满足信息交互的实用性，又能实现设计美学的表达。
       </Components.p>
 
       <div className="flex flex-wrap gap-4">
-        <img className="w-32 h-32" src="/qr-code.png" />
-        <img className="w-32 h-32" src="/qr-code-1.png" />
+        <img className="w-64 h-64" src="/qr-code.png" />
+        <img className="w-64 h-64" src="/qr-code-1.png" />
       </div>
     </>
   )

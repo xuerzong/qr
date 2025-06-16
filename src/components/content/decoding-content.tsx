@@ -7,7 +7,7 @@ export const DecodingContent = () => {
   const { qr } = useQRCode()
   return (
     <>
-      <Components.h2>解码内容</Components.h2>
+      <Components.h3>解码内容</Components.h3>
       <Components.p>
         二维码的解码内容包括多个方面，如定位标记、纠错级别、版本信息、数据编码等。了解这些内容有助于更好地理解二维码的结构和功能。
       </Components.p>

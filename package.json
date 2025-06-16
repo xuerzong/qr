@@ -16,7 +16,8 @@
     "@radix-ui/react-switch": "^1.2.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.3",
+    "use-debounce": "^10.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",
