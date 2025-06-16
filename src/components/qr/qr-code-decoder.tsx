@@ -16,9 +16,14 @@ const featureColors: Record<string, string> = {
 interface QRCodeDecoderProps {
   features?: string[]
   paths?: string[]
+  image?: string
 }
 
-const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({ features = [], paths = [] }) => {
+const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({
+  features = [],
+  paths = [],
+  image = '',
+}) => {
   const { qr, xorMask } = useQRCode()
 
   const targetCells = useMemo(() => {
@@ -74,6 +79,17 @@ const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({ features = [], p
   const byteContentPaths = useMemo(() => {
     return qr.generateDecodingContentPath()
   }, [qr])
+
+  const imageSize = 6 * qr.cellSize
+
+  const imagePosition = useMemo(() => {
+    const centerX = (qr.size * qr.cellSize) / 2 - imageSize / 2
+    const centerY = (qr.size * qr.cellSize) / 2 - imageSize / 2
+    return {
+      x: centerX,
+      y: centerY,
+    }
+  }, [qr, imageSize])
 
   return (
     <div className="relative flex items-center justify-center cursor-pointer">
@@ -155,6 +171,20 @@ const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({ features = [], p
                 strokeLinecap="round"
               />
             ))}
+
+          {image && (
+            <>
+              <rect
+                {...imagePosition}
+                width={imageSize}
+                height={imageSize}
+                fill="white"
+                stroke="black"
+                strokeWidth="2"
+              />
+              <image href={image} {...imagePosition} width={imageSize} height={imageSize} />
+            </>
+          )}
         </svg>
       </div>
     </div>
