@@ -2,9 +2,14 @@ import Components from './components'
 import { AlignmentPatterns } from './components/content/alignment-patterns'
 import { DarkModule } from './components/content/dark-module'
 import { DataArea } from './components/content/data-area'
+import { DecodingContent } from './components/content/decoding-content'
+import { DecodingLength } from './components/content/decoding-length'
 import { EncodingMode } from './components/content/encoding-mode'
+import { ErrorCorrection } from './components/content/error-correction'
 import { FinderPatterns } from './components/content/finder-patterns'
 import { FormatInformation } from './components/content/format-information'
+import { Other } from './components/content/other'
+import { ReadingOrder } from './components/content/reading-order'
 import { Separators } from './components/content/separators'
 import { TimingPatterns } from './components/content/timing-patterns'
 import { VersionInformation } from './components/content/version-information'
@@ -14,7 +19,7 @@ import { QRCodeProvider } from './components/qr/qr-code-provider'
 export const App = () => {
   return (
     <QRCodeProvider>
-      <main className="max-w-screen-md mx-auto">
+      <main className="max-w-screen-md mx-auto pb-16">
         <Components.h1>二维码解剖学</Components.h1>
 
         <Components.h2>背景介绍</Components.h2>
@@ -77,7 +82,28 @@ export const App = () => {
 
         <section>
           <Components.h2>二维码解剖</Components.h2>
+          <ReadingOrder />
           <EncodingMode />
+          <DecodingLength />
+          <DecodingContent />
+          <ErrorCorrection />
+          <Other />
+        </section>
+
+        <section>
+          <Components.h2>结语</Components.h2>
+          <Components.p>
+            二维码（QR
+            Code）作为一种高效、可靠的信息载体，其精妙的结构设计体现了工程学与信息技术的完美结合。从定位图案的快速识别，到数据区的灵活编码，再到纠错机制的强大容错能力，每一个功能模块都经过严谨的优化，以确保二维码在各类复杂环境下仍能稳定工作。
+          </Components.p>
+
+          <Components.p>
+            无论是日常生活中的扫码支付、物流追踪，还是工业领域的自动化识别，二维码都展现出了极高的适应性和扩展性。
+          </Components.p>
+
+          <Components.p>
+            技术的本质在于解决问题，而二维码正是这一理念的杰出代表——用简洁的设计，实现广泛的应用。希望本次分享能让大家更深入地认识二维码，并在实际使用中更加得心应手。
+          </Components.p>
         </section>
       </main>
     </QRCodeProvider>

@@ -1,9 +1,8 @@
 'use client'
 
-import { BinaryCode } from './binary-code'
-import { maskMatrix, maskFunctions } from './utils'
+import { ClientOnly } from '../client-only'
 import { useQRCode } from './qr-code-provider'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 const featureColors: Record<string, string> = {
   finders: 'rgba(239, 68, 68, 0.6)', // red
@@ -13,50 +12,54 @@ const featureColors: Record<string, string> = {
   darkModule: 'red', // red
 }
 
-interface QRCodeMarkProps {
-  value: string
-}
+interface QRCodeMarkProps {}
 
-export const QRCodeMask: React.FC<QRCodeMarkProps> = ({ value = '011' }) => {
+export const QRCodeMaskComponent: React.FC<QRCodeMarkProps> = ({}) => {
+  if (typeof window === 'undefined') {
+    return null
+  }
   const { qr } = useQRCode()
 
   const maskCells = useMemo(() => {
     return qr.generateMaskCells()
   }, [qr])
 
-  const getProperties = (x: number, y: number) => {
-    let feature = ''
+  const getProperties = useCallback(
+    (x: number, y: number) => {
+      let feature = ''
 
-    if (qr.isFinders({ i: y, j: x })) {
-      feature = 'finders'
-    }
+      if (qr.isFinders({ i: y, j: x })) {
+        feature = 'finderPatterns'
+      } else if (qr.isDarkModule({ i: y, j: x })) {
+        feature = 'darkModule'
+      } else if (qr.isSeparators({ i: y, j: x })) {
+        feature = 'separators'
+      } else if (qr.isTimingPatterns({ i: y, j: x })) {
+        feature = 'timingPatterns'
+      } else if (qr.isFormatInformation({ i: y, j: x })) {
+        feature = 'formatInformation'
+      } else if (qr.isAlignmentPatterns({ i: y, j: x })) {
+        feature = 'alignmentPatterns'
+      }
 
-    if (qr.isDarkModule({ i: y, j: x })) {
-      feature = 'darkModule'
-    }
+      return {
+        fill: featureColors[feature] || 'transparent',
+      }
+    },
+    [qr]
+  )
 
-    if (qr.isSeparators({ i: y, j: x })) {
-      feature = 'separators'
-    }
-
-    if (qr.isTimingPatterns({ i: y, j: x })) {
-      feature = 'timingPatterns'
-    }
-
-    if (qr.isFormatInformation({ i: y, j: x })) {
-      feature = 'formatInformation'
-    }
-
-    return {
-      fill: featureColors[feature] || 'transparent',
-    }
-  }
+  const encodingModePaths = useMemo(() => {
+    return qr.generateEncodingModePaths()
+  }, [qr])
 
   return (
     <div className="relative flex items-center justify-center cursor-pointer">
       <div className="inline-block p-6 my-4 bg-white rounded">
         <svg
-          viewBox={`0 0 ${qr.size * qr.cellSize} ${qr.size * qr.cellSize}`}
+          viewBox={`${-qr.cellSize / 2} ${-qr.cellSize / 2} ${
+            qr.size * qr.cellSize + qr.cellSize
+          } ${qr.size * qr.cellSize + qr.cellSize}`}
           width={qr.size * qr.cellSize}
           height={qr.size * qr.cellSize}
         >
@@ -99,5 +102,13 @@ export const QRCodeMask: React.FC<QRCodeMarkProps> = ({ value = '011' }) => {
         </svg>
       </div>
     </div>
+  )
+}
+
+export const QRCodeMask = () => {
+  return (
+    <ClientOnly fallback={null}>
+      <QRCodeMaskComponent />
+    </ClientOnly>
   )
 }

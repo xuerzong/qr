@@ -21,6 +21,8 @@ interface TraversalRecord {
   position: Position
   order: number
   direction: number
+  value: number
+  xorMaskValue: number
 }
 
 export class QRCode {
@@ -46,6 +48,47 @@ export class QRCode {
       .slice(0, 4)
       .map((i) => i.order)
       .join('')
+  }
+
+  get decodingLength(): string {
+    return this.traversalRecord
+      .slice(4, 12)
+      .map((i) => i.xorMaskValue)
+      .join('')
+  }
+
+  get decodingBytes(): string[] {
+    return chunk(this.traversalRecord.slice(12), 8)
+      .slice(0, this.value.length)
+      .map((d) => d.map((point) => point.xorMaskValue))
+      .map((d) => d.join(''))
+  }
+
+  get decodedContent(): string {
+    const bytePoints = chunk(this.traversalRecord.slice(12), 8).slice(0, this.value.length)
+    return bytePoints
+      .map((points) => {
+        return points
+          .map((point) => point.xorMaskValue)
+          .reduce((acc, cur) => (acc << 1) | cur, 0)
+          .toString(2)
+          .padStart(8, '0')
+      })
+      .map((byte) => String.fromCharCode(parseInt(byte, 2)))
+      .join('')
+  }
+
+  get decodingLengthDecimal(): number {
+    return parseInt(this.decodingLength, 2)
+  }
+
+  get xorMaskCells(): number[][] {
+    return this.cells.map((row, i) =>
+      row.map((cell, j) => {
+        const invert = this.getXorMaskInvert({ i, j })
+        return invert ? cell ^ 1 : cell
+      })
+    )
   }
 
   generateReadPaths(): PathSegment[] {
@@ -128,10 +171,14 @@ export class QRCode {
       if (cell.i < 0 || cell.i > size || cell.j < 0 || cell.j > size) {
         return
       }
+      const cellValue = this.cells[cell.i][cell.j]
+      const xorMaskValue = this.xorMaskCells[cell.i][cell.j]
       traversalHistory.push({
         position: cell,
         order,
         direction,
+        value: cellValue,
+        xorMaskValue: xorMaskValue,
       })
       order += 1
     }
@@ -320,43 +367,46 @@ export class QRCode {
     return paths
   }
 
-  generateMaskCells(): number[][] {
+  getXorMaskInvert({ i, j }: Position) {
     const mask = this.qr.mask
+    let invert = false
+    switch (mask) {
+      case 0:
+        invert = (i + j) % 2 === 0
+        break
+      case 1:
+        invert = i % 2 === 0
+        break
+      case 2:
+        invert = j % 3 === 0
+        break
+      case 3:
+        invert = (i + j) % 3 === 0
+        break
+      case 4:
+        invert = (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0
+        break
+      case 5:
+        invert = ((i * j) % 2) + ((i * j) % 3) === 0
+        break
+      case 6:
+        invert = (((i * j) % 2) + ((i * j) % 3)) % 2 == 0
+        break
+      case 7:
+        invert = (((i + j) % 2) + ((i * j) % 3)) % 2 === 0
+        break
+      default:
+        throw new Error('Unreachable')
+    }
+    return invert && !this.isSpecialRegion({ i, j })
+  }
+
+  generateMaskCells(): number[][] {
     const cells = new Array(this.qr.size).fill(0).map(() => new Array(this.qr.size).fill(0))
-    for (let j = 0; j < this.qr.size; j++) {
-      for (let i = 0; i < this.qr.size; i++) {
-        let invert = false
-        switch (mask) {
-          case 0:
-            invert = (i + j) % 2 === 0
-            break
-          case 1:
-            invert = j % 2 === 0
-            break
-          case 2:
-            invert = i % 3 === 0
-            break
-          case 3:
-            invert = (i + j) % 3 === 0
-            break
-          case 4:
-            invert = (Math.floor(i / 3) + Math.floor(j / 2)) % 2 === 0
-            break
-          case 5:
-            invert = ((i * j) % 2) + ((i * j) % 3) === 0
-            break
-          case 6:
-            invert = (((i * j) % 2) + ((i * j) % 3)) % 2 === 0
-            break
-          case 7:
-            invert = (((i + j) % 2) + ((i * j) % 3)) % 2 === 0
-            break
-          default:
-            throw new Error('Unreachable')
-        }
-        if (invert && !this.isSpecialRegion({ i, j })) {
-          cells[i][j] = 1
-        }
+    for (let i = 0; i < this.qr.size; i++) {
+      for (let j = 0; j < this.qr.size; j++) {
+        let invert = this.getXorMaskInvert({ i, j })
+        cells[i][j] = invert ? 1 : 0
       }
     }
     return cells

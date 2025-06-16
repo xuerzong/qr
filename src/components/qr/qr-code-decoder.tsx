@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { featureFunctions, allFeatures, maskFunctions, getMaskNo } from './utils'
 import { useQRCode } from './qr-code-provider'
+import { ClientOnly } from '../client-only'
 
 const featureColors: Record<string, string> = {
   finderPatterns: 'rgba(239, 68, 68, 0.6)', // red
@@ -15,49 +15,17 @@ const featureColors: Record<string, string> = {
 
 interface QRCodeDecoderProps {
   features?: string[]
-  xorMask?: boolean
   paths?: string[]
 }
 
-const isFeature = ({ i, j }: { i: number; j: number }) => {
-  let feature = ''
-  for (let k = 0; k < allFeatures.length; k++) {
-    const key = allFeatures[k]
-    if (featureFunctions[key]({ i, j })) {
-      feature = key
-      break
-    }
-  }
-  return Boolean(feature)
-}
-
-export const QRCodeDecoder: React.FC<QRCodeDecoderProps> = ({
-  features = [],
-  xorMask = false,
-  paths = [],
-}) => {
-  const { qr, QR_CONFIG } = useQRCode()
+const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({ features = [], paths = [] }) => {
+  const { qr, xorMask } = useQRCode()
 
   const targetCells = useMemo(() => {
     if (!xorMask) {
       return qr.cells
     }
-
-    return qr.cells.map((row, i) =>
-      row.map((cell, j) => {
-        let feature = ''
-        for (let k = 0; k < allFeatures.length; k++) {
-          const key = allFeatures[k]
-          if (featureFunctions[key]({ i, j })) {
-            feature = key
-            break
-          }
-        }
-        return isFeature({ i, j })
-          ? cell
-          : (maskFunctions[getMaskNo(qr.cells)]({ i, j }) ? 1 : 0) ^ cell
-      })
-    )
+    return qr.xorMaskCells
   }, [qr, xorMask])
 
   const getProperties = useCallback(
@@ -111,20 +79,20 @@ export const QRCodeDecoder: React.FC<QRCodeDecoderProps> = ({
     <div className="relative flex items-center justify-center cursor-pointer">
       <div className="inline-block p-6 my-4 bg-white rounded">
         <svg
-          viewBox={`-10 -10 ${
-            targetCells[0].length * QR_CONFIG.cellSize + 2 * QR_CONFIG.cellSize
-          } ${targetCells.length * QR_CONFIG.cellSize + 2 * QR_CONFIG.cellSize}`}
-          width={targetCells[0].length * QR_CONFIG.cellSize}
-          height={targetCells.length * QR_CONFIG.cellSize}
+          viewBox={`${-qr.cellSize / 2} ${-qr.cellSize / 2} ${
+            qr.size * qr.cellSize + qr.cellSize
+          } ${qr.size * qr.cellSize + qr.cellSize}`}
+          width={targetCells[0].length * qr.cellSize}
+          height={targetCells.length * qr.cellSize}
         >
           {targetCells.map((row, rowIndex) =>
             row.map((col, colIndex) => (
               <rect
                 key={`${rowIndex}-${colIndex}`}
-                x={colIndex * QR_CONFIG.cellSize}
-                y={rowIndex * QR_CONFIG.cellSize}
-                width={QR_CONFIG.cellSize}
-                height={QR_CONFIG.cellSize}
+                x={colIndex * qr.cellSize}
+                y={rowIndex * qr.cellSize}
+                width={qr.cellSize}
+                height={qr.cellSize}
                 fill={col ? 'black' : 'white'}
               />
             ))
@@ -134,10 +102,10 @@ export const QRCodeDecoder: React.FC<QRCodeDecoderProps> = ({
             row.map((col, colIndex) => (
               <rect
                 key={`${rowIndex}-${colIndex}`}
-                x={colIndex * QR_CONFIG.cellSize}
-                y={rowIndex * QR_CONFIG.cellSize}
-                width={QR_CONFIG.cellSize}
-                height={QR_CONFIG.cellSize}
+                x={colIndex * qr.cellSize}
+                y={rowIndex * qr.cellSize}
+                width={qr.cellSize}
+                height={qr.cellSize}
                 {...(getProperties(colIndex, rowIndex) || {})}
               />
             ))
@@ -190,5 +158,13 @@ export const QRCodeDecoder: React.FC<QRCodeDecoderProps> = ({
         </svg>
       </div>
     </div>
+  )
+}
+
+export const QRCodeDecoder: React.FC<QRCodeDecoderProps> = (props) => {
+  return (
+    <ClientOnly fallback={null}>
+      <QRCodeDecoderComponent {...props} />
+    </ClientOnly>
   )
 }

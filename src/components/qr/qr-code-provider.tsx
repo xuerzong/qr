@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { Position, QRConfig } from './utils'
+import { Position } from './utils'
 import { QRCode } from '@/lib/qr'
 
 interface QRCodeContextState {
@@ -9,14 +9,17 @@ interface QRCodeContextState {
   value: string
   onChange: (value: string) => void
   QRCodeCells: number[][]
-  QR_CONFIG: QRConfig
   isInSpecialRegion: (type: string, position: Position) => boolean
+
+  xorMask?: boolean
+  changeXorMask?: (value: boolean) => void
 }
 
 const QRCodeContext = React.createContext<QRCodeContextState | null>(null)
 
 export const QRCodeProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [QRCodeValue, setQRCodeValue] = useState('Hello world!'.repeat(1))
+  const [xorMask, setXorMask] = useState(false)
 
   const qr = useMemo(() => {
     return new QRCode(QRCodeValue)
@@ -25,13 +28,6 @@ export const QRCodeProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const cells = useMemo(() => {
     return qr.cells
   }, [qr])
-
-  const QR_CONFIG = useMemo(() => {
-    return {
-      size: cells.length,
-      cellSize: 20,
-    }
-  }, [cells])
 
   console.log(qr.qr.mask)
   // @ts-ignore
@@ -42,7 +38,10 @@ export const QRCodeProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     onChange: (value: string) => {
       setQRCodeValue(value)
     },
-    QR_CONFIG,
+    xorMask,
+    changeXorMask: (value: boolean) => {
+      setXorMask(value)
+    },
   }
   return <QRCodeContext.Provider value={value}>{children}</QRCodeContext.Provider>
 }

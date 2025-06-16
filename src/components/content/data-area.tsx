@@ -1,6 +1,5 @@
 import Components from '..'
 import { QRCodeDecoder } from '../qr/qr-code-decoder'
-import { useQRCode } from '../qr/qr-code-provider'
 
 export const DataArea = () => {
   return (

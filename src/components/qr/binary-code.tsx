@@ -1,5 +1,6 @@
 'use client'
 
+import { ClientOnly } from '../client-only'
 import { useQRCode } from './qr-code-provider'
 
 interface BinaryCodeProps {
@@ -7,7 +8,7 @@ interface BinaryCodeProps {
   getProperties?: (x: number, y: number) => React.SVGProps<SVGRectElement>
 }
 
-export const BinaryCode: React.FC<BinaryCodeProps> = ({ value, getProperties }) => {
+export const BinaryCodeComponent: React.FC<BinaryCodeProps> = ({ value, getProperties }) => {
   const { qr } = useQRCode()
   return (
     <svg
@@ -29,5 +30,13 @@ export const BinaryCode: React.FC<BinaryCodeProps> = ({ value, getProperties }) 
         ))
       )}
     </svg>
+  )
+}
+
+export const BinaryCode: React.FC<BinaryCodeProps> = (props) => {
+  return (
+    <ClientOnly fallback={null}>
+      <BinaryCodeComponent {...props} />
+    </ClientOnly>
   )
 }

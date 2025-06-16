@@ -1,6 +1,7 @@
 import Components from '..'
 import { BinaryCode } from '../qr/binary-code'
 import { QRCodeDecoder } from '../qr/qr-code-decoder'
+import { QRCodeMask } from '../qr/qr-mask'
 
 export const maskMatrix = new Array(6).fill(0).map(() => new Array(6).fill(0))
 
@@ -85,6 +86,8 @@ export const FormatInformation = () => {
           </div>
         ))}
       </div>
+
+      <QRCodeMask />
 
       <Components.p>
         QR码生成时，为了保证二维码具有良好的可读性和识别性，需自动选择
