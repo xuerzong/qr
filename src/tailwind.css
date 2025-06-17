@@ -8,3 +8,13 @@ html,
 body {
   overscroll-behavior: none;
 }
+
+@theme {
+  --color-border: #e5e7eb;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}

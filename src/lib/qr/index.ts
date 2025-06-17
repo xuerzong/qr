@@ -25,6 +25,15 @@ interface TraversalRecord {
   xorMaskValue: number
 }
 
+export const qrCodeEcls = ['L', 'M', 'Q', 'H'] as const
+type QRCodeEcl = (typeof qrCodeEcls)[number]
+const qrCodeEclValues: Record<QRCodeEcl, qrcodegen.QrCode.Ecc> = {
+  L: qrcodegen.QrCode.Ecc.LOW,
+  M: qrcodegen.QrCode.Ecc.MEDIUM,
+  Q: qrcodegen.QrCode.Ecc.QUARTILE,
+  H: qrcodegen.QrCode.Ecc.HIGH,
+}
+
 export class QRCode {
   qr: qrcodegen.QrCode
   cells: number[][] = []
@@ -32,8 +41,8 @@ export class QRCode {
   traversalRecord: TraversalRecord[]
   value: string
 
-  constructor(value: string) {
-    this.qr = qrcodegen.QrCode.encodeText(value, qrcodegen.QrCode.Ecc.LOW)
+  constructor(value: string, ecl: QRCodeEcl = 'L') {
+    this.qr = qrcodegen.QrCode.encodeText(value, qrCodeEclValues[ecl])
     this.cells = this.qr.getModules().map((row) => row.map((cell) => (cell ? 1 : 0)))
     this.traversalRecord = this.getTraversalRecord()
     this.value = value
