@@ -22,15 +22,15 @@ export const EncodingMode = () => {
         <Components.li>
           <Components.p>
             <Components.strong>数字模式（0001）：</Components.strong>
-            仅包含数字（0-9），每个数字占用 10 位。
+            仅包含数字（0-9），每3个数字占用 10 位。储存效率较高，适用于纯数字信息的二维码。
           </Components.p>
         </Components.li>
 
         <Components.li>
           <Components.p>
             <Components.strong>字母数字模式（0010）：</Components.strong>
-            包含数字（0-9）、大写字母（A-Z）和一些特殊字符（空格、$、%、\*、+、-、.、/），每个字符占用
-            11 位 位。
+            包含数字（0-9）、大写字母（A-Z）和一些特殊字符（空格、$、%、\*、+、-、.、/），2个字符占用
+            11 位。储存效率中等，适用于包含字母和数字的二维码。
           </Components.p>
         </Components.li>
 
@@ -38,23 +38,14 @@ export const EncodingMode = () => {
           <Components.p>
             <Components.strong>字节模式（0100）：</Components.strong>
             使用 ISO-8859-1 字符集（Latin-1），每个字符占用 8 位。
-          </Components.p>
-        </Components.li>
-
-        <Components.li>
-          <Components.p>
-            <Components.strong>ECI 模式（0111）：</Components.strong>
-            用于存储汉字等多字节字符，使用 UTF-8 编码，每个字符占用 13 位。
-          </Components.p>
-        </Components.li>
-
-        <Components.li>
-          <Components.p>
-            <Components.strong>Kanji 模式（1000）：</Components.strong>
-            专门用于存储日文汉字，使用 Shift JIS 编码，每个字符占用 13 位。
+            适用于存储多种语言字符和符号，具有较高的灵活性和兼容性。
           </Components.p>
         </Components.li>
       </Components.ul>
+      <Components.p>
+        这些是最常用的编码模式（还有Kanji模式、ECI -
+        拓展通道解释等等），二维码生成时会根据输入内容自动选择最合适的编码模式。
+      </Components.p>
       <QRCodeDecoder
         features={[
           'finderPatterns',

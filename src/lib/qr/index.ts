@@ -100,6 +100,21 @@ export class QRCode {
     )
   }
 
+  get formatInformationBits(): string {
+    let bits: string[] = []
+
+    // 前7位
+    for (let i = this.qr.size - 1; i > this.qr.size - 8; i--) {
+      bits.push(this.cells[i][8].toString())
+    }
+    // 副本后8位
+    for (let j = this.qr.size - 1; j > this.qr.size - 9; j--) {
+      bits.push(this.cells[8][j].toString())
+    }
+
+    return bits.join('')
+  }
+
   generateReadPaths(): PathSegment[] {
     const points = this.traversalRecord
     const paths: PathSegment[] = []
@@ -140,6 +155,21 @@ export class QRCode {
       paths.push(...this.getRectPaths(points))
     })
     return paths
+  }
+
+  generateMaskNoPath(): PathSegment[] {
+    const points: TraversalRecord[] = [
+      { i: 8, j: 2 },
+      { i: 8, j: 3 },
+      { i: 8, j: 4 },
+    ].map((p, pIndex) => ({
+      position: p,
+      order: pIndex,
+      direction: 1,
+      value: this.cells[p.i][p.j],
+      xorMaskValue: this.xorMaskCells[p.i][p.j],
+    }))
+    return this.getRectPaths(points)
   }
 
   getTraversalRecord(): TraversalRecord[] {

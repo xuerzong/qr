@@ -80,6 +80,10 @@ const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({
     return qr.generateDecodingContentPath()
   }, [qr])
 
+  const maskNoPaths = useMemo(() => {
+    return qr.generateMaskNoPath()
+  }, [qr])
+
   const imageSize = 6 * qr.cellSize
 
   const imagePosition = useMemo(() => {
@@ -167,6 +171,17 @@ const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({
                 key={`decoding-${index}`}
                 {...path}
                 stroke="purple"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+            ))}
+
+          {paths.includes('maskNo') &&
+            maskNoPaths.map((path, index) => (
+              <line
+                key={`mask-${index}`}
+                {...path}
+                stroke="red"
                 strokeWidth="4"
                 strokeLinecap="round"
               />

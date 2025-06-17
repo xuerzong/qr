@@ -32,6 +32,12 @@ export const ErrorCorrection = () => {
       <Components.p>
         <Components.strong>Reed-Solomon算法</Components.strong>
       </Components.p>
+      <Components.p>
+        可以参考：
+        <a href="https://www.nayuki.io/page/reed-solomon-error-correcting-code-decoder">
+          https://www.nayuki.io/page/reed-solomon-error-correcting-code-decoder
+        </a>
+      </Components.p>
     </>
   )
 }
