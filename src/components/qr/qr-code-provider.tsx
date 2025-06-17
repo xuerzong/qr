@@ -1,16 +1,14 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { Position } from './utils'
 import { QRCode } from '@/lib/qr'
-import { useDebounce, useDebouncedCallback } from 'use-debounce'
+import { useDebounce } from 'use-debounce'
 
 interface QRCodeContextState {
   qr: QRCode
   value: string
   onChange: (value: string) => void
   QRCodeCells: number[][]
-  isInSpecialRegion: (type: string, position: Position) => boolean
 
   xorMask?: boolean
   changeXorMask?: (value: boolean) => void
