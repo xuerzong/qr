@@ -49,10 +49,6 @@ export const QRCodeMaskComponent: React.FC<QRCodeMarkProps> = ({}) => {
     [qr]
   )
 
-  const encodingModePaths = useMemo(() => {
-    return qr.generateEncodingModePaths()
-  }, [qr])
-
   return (
     <div className="relative flex items-center justify-center cursor-pointer">
       <div className="inline-block p-6 my-4 bg-white rounded">

@@ -38,6 +38,8 @@ export const QRCodeProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     return new QRCode(debounceQRCodeValue, ecl)
   }, [debounceQRCodeValue, ecl])
 
+  console.log(qr.qr.mask, 'qr.qr.mask')
+
   const cells = useMemo(() => {
     return qr.cells
   }, [qr])

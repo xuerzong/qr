@@ -59,7 +59,7 @@ export const FormatInformation = () => {
 
   return (
     <>
-      <Components.h3>5、格式信息（Format Information）</Components.h3>
+      <Components.h3>格式信息（Format Information）</Components.h3>
       <Components.p>
         格式信息是二维码中用于存储纠错级别和掩码模式的关键信息。它通常位于二维码的左上角和右下角，包含了二维码的纠错级别（L、M、Q、H）和掩码模式（0-7）。这些信息对于正确解码二维码至关重要，因为它们帮助扫描设备理解如何处理二维码中的数据。
       </Components.p>

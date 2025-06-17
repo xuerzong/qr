@@ -12,7 +12,6 @@ import { Other } from './components/content/other'
 import { ReadingOrder } from './components/content/reading-order'
 import { Separators } from './components/content/separators'
 import { TimingPatterns } from './components/content/timing-patterns'
-import { VersionInformation } from './components/content/version-information'
 import { QRCodeEditor } from './components/qr/qr-code-editor'
 import { QRCodeProvider, useQRCode } from './components/qr/qr-code-provider'
 
@@ -77,7 +76,6 @@ const Component = () => {
           <Separators />
           <TimingPatterns />
           <FormatInformation />
-          <VersionInformation />
           <DarkModule />
           <DataArea />
         </section>

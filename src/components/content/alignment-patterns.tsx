@@ -9,7 +9,7 @@ export const AlignmentPatterns = () => {
 
   return (
     <>
-      <Components.h3>2、对齐标记（Alignment Patterns）</Components.h3>
+      <Components.h3>对齐标记（Alignment Patterns）</Components.h3>
 
       {version >= 2 ? (
         <>
