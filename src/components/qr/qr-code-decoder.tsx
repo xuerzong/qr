@@ -143,7 +143,7 @@ const QRCodeDecoderComponent: React.FC<QRCodeDecoderProps> = ({
               />
             ))}
 
-          {paths.includes('decodingMode') &&
+          {paths.includes('decodingModeBits') &&
             encodingModePaths.map((path, index) => (
               <line
                 key={`encoding-${index}`}

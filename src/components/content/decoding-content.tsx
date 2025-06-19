@@ -2,6 +2,7 @@ import Components from '..'
 import { ClientOnly } from '../client-only'
 import { QRCodeDecoder } from '../qr/qr-code-decoder'
 import { useQRCode } from '../qr/qr-code-provider'
+import { QRCode } from '@/lib/qr'
 
 export const DecodingContent = () => {
   const { qr } = useQRCode()
@@ -30,23 +31,21 @@ export const DecodingContent = () => {
             <Components.tr>
               <Components.th>编号</Components.th>
               <Components.th>二进制</Components.th>
-              <Components.th>字符</Components.th>
+              <Components.th>结果</Components.th>
             </Components.tr>
           </Components.thead>
 
           <Components.tbody>
-            {qr.decodingBytes.map((byte, byteIndex) => (
-              <Components.tr key={byteIndex}>
-                <Components.td>{byteIndex}</Components.td>
-                <Components.td>{byte}</Components.td>
-                <Components.td>{String.fromCharCode(parseInt(byte, 2))}</Components.td>
+            {qr.decodingBytes.map((bytes, bytesIndex) => (
+              <Components.tr key={bytesIndex}>
+                <Components.td>{bytesIndex}</Components.td>
+                <Components.td>{bytes}</Components.td>
+                <Components.td>{QRCode.bytes2Char(bytes, qr.decodingMode)}</Components.td>
               </Components.tr>
             ))}
           </Components.tbody>
         </Components.table>
       </ClientOnly>
-
-      <Components.p>完整内容：{qr.decodedContent}</Components.p>
     </>
   )
 }

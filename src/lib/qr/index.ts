@@ -1,5 +1,6 @@
 import { qrcodegen } from './codegen'
 import { chunk } from '../utils/array'
+import { alphanumericChars } from '../alphanumeric'
 export interface PathSegment {
   x1: number
   y1: number
@@ -35,6 +36,39 @@ const qrCodeEclValues: Record<QRCodeEcl, qrcodegen.QrCode.Ecc> = {
 }
 
 export class QRCode {
+  static isBytesMode = (value: string): boolean => {
+    return value === '0100'
+  }
+
+  static isNumericMode = (value: string): boolean => {
+    return value === '0001'
+  }
+
+  static isAlphanumericMode = (value: string): boolean => {
+    return value === '0010'
+  }
+
+  static bytes2Char = (
+    bytes: string,
+    mode: 'Bytes' | 'Numeric' | 'Alphanumeric' | 'Unknown'
+  ): string => {
+    switch (mode) {
+      case 'Bytes':
+        return String.fromCharCode(parseInt(bytes, 2))
+      case 'Numeric':
+        return parseInt(bytes, 2).toString() // ASCII码偏移
+      case 'Alphanumeric':
+        const value = parseInt(bytes, 2)
+        const firstCharIndex = Math.floor(value / 45)
+        const lastCharIndex = value % 45
+        return bytes.length < 11
+          ? alphanumericChars[lastCharIndex]
+          : `${alphanumericChars[firstCharIndex]}${alphanumericChars[lastCharIndex]}`
+      default:
+        return ''
+    }
+  }
+
   qr: qrcodegen.QrCode
   cells: number[][] = []
   public cellSize = 20
@@ -52,25 +86,108 @@ export class QRCode {
     return this.qr.size
   }
 
-  get decodingMode(): string {
+  get decodingModeBits(): string {
     return this.traversalRecord
       .slice(0, 4)
       .map((i) => i.xorMaskValue)
       .join('')
   }
 
+  get decodingMode(): 'Bytes' | 'Numeric' | 'Alphanumeric' | 'Unknown' {
+    if (QRCode.isBytesMode(this.decodingModeBits)) {
+      return 'Bytes'
+    }
+
+    if (QRCode.isNumericMode(this.decodingModeBits)) {
+      return 'Numeric'
+    }
+
+    if (QRCode.isAlphanumericMode(this.decodingModeBits)) {
+      return 'Alphanumeric'
+    }
+
+    return 'Unknown'
+  }
+
   get decodingLength(): string {
-    return this.traversalRecord
-      .slice(4, 12)
-      .map((i) => i.xorMaskValue)
-      .join('')
+    if (this.decodingMode === 'Bytes') {
+      return this.traversalRecord
+        .slice(4, 12)
+        .map((i) => i.xorMaskValue)
+        .join('')
+    }
+
+    if (this.decodingMode === 'Numeric') {
+      return this.traversalRecord
+        .slice(4, 14)
+        .map((i) => i.xorMaskValue)
+        .join('')
+    }
+
+    if (this.decodingMode === 'Alphanumeric') {
+      return this.traversalRecord
+        .slice(4, 13)
+        .map((i) => i.xorMaskValue)
+        .join('')
+    }
+
+    return ''
   }
 
   get decodingBytes(): string[] {
-    return chunk(this.traversalRecord.slice(12), 8)
-      .slice(0, this.value.length)
-      .map((d) => d.map((point) => point.xorMaskValue))
-      .map((d) => d.join(''))
+    if (this.decodingMode === 'Bytes') {
+      return chunk(this.traversalRecord.slice(12), 8)
+        .slice(0, this.value.length)
+        .map((d) => d.map((point) => point.xorMaskValue))
+        .map((d) => d.join(''))
+    }
+
+    if (this.decodingMode === 'Numeric') {
+      const bytePoints = chunk(this.traversalRecord.slice(14), 10)
+
+      const isFull = this.value.length % 3 === 0
+
+      if (isFull) {
+        return bytePoints
+          .slice(0, Math.ceil(this.value.length / 3))
+          .map((d) => d.map((point) => point.xorMaskValue))
+          .map((d) => d.join(''))
+      } else {
+        const fullBytes = bytePoints.slice(0, Math.floor(this.value.length / 3))
+        const lastByteLengths = [4, 7, 10]
+        const lastByte = bytePoints[Math.floor(this.value.length / 3)].slice(
+          0,
+          lastByteLengths[(this.value.length % 3) - 1]
+        )
+        return [...fullBytes, lastByte]
+          .map((d) => d.map((point) => point.xorMaskValue))
+          .map((d) => d.join(''))
+      }
+    }
+
+    if (this.decodingMode === 'Alphanumeric') {
+      const bytePoints = chunk(this.traversalRecord.slice(13), 11)
+      const isFull = this.value.length % 2 === 0
+
+      if (isFull) {
+        return bytePoints
+          .slice(0, Math.ceil(this.value.length / 2))
+          .map((d) => d.map((point) => point.xorMaskValue))
+          .map((d) => d.join(''))
+      } else {
+        const fullBytes = bytePoints.slice(0, Math.floor(this.value.length / 2))
+        const lastByteLengths = [6, 11]
+        const lastByte = bytePoints[Math.floor(this.value.length / 2)].slice(
+          0,
+          lastByteLengths[(this.value.length % 2) - 1]
+        )
+        return [...fullBytes, lastByte]
+          .map((d) => d.map((point) => point.xorMaskValue))
+          .map((d) => d.join(''))
+      }
+    }
+
+    return [] as string[]
   }
 
   get decodedContent(): string {
@@ -145,11 +262,56 @@ export class QRCode {
   }
 
   generateDecodingLengthPaths(): PathSegment[] {
-    return this.getRectPaths(this.traversalRecord.slice(4, 12))
+    if (this.decodingMode === 'Bytes') {
+      return this.getRectPaths(this.traversalRecord.slice(4, 12))
+    }
+
+    if (this.decodingMode === 'Numeric') {
+      return this.getRectPaths(this.traversalRecord.slice(4, 14))
+    }
+
+    if (this.decodingMode === 'Alphanumeric') {
+      return this.getRectPaths(this.traversalRecord.slice(4, 13))
+    }
+
+    return []
   }
 
   generateDecodingContentPath(): PathSegment[] {
-    const bytePoints = chunk(this.traversalRecord.slice(12), 8)
+    let bytePoints: TraversalRecord[][] = []
+    if (this.decodingMode === 'Bytes') {
+      bytePoints = chunk(this.traversalRecord.slice(12), 8).slice(0, this.value.length)
+    }
+
+    if (this.decodingMode === 'Numeric') {
+      bytePoints = chunk(this.traversalRecord.slice(14), 10).slice(
+        0,
+        Math.ceil(this.value.length / 3)
+      )
+      const isFull = this.value.length % 3 === 0
+      if (!isFull) {
+        const lastByteLengths = [4, 7, 10]
+        bytePoints[bytePoints.length - 1] = bytePoints[bytePoints.length - 1].slice(
+          0,
+          lastByteLengths[(this.value.length % 3) - 1]
+        )
+      }
+    }
+
+    if (this.decodingMode === 'Alphanumeric') {
+      bytePoints = chunk(this.traversalRecord.slice(13), 11).slice(
+        0,
+        Math.ceil(this.value.length / 2)
+      )
+      const isFull = this.value.length % 2 === 0
+      if (!isFull) {
+        const lastByteLengths = [6, 11]
+        bytePoints[bytePoints.length - 1] = bytePoints[bytePoints.length - 1].slice(
+          0,
+          lastByteLengths[(this.value.length % 2) - 1]
+        )
+      }
+    }
     let paths: PathSegment[] = []
     bytePoints.forEach((points) => {
       paths.push(...this.getRectPaths(points))

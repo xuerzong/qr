@@ -18,7 +18,6 @@ import { QRCodeProvider, useQRCode } from './components/qr/qr-code-provider'
 
 const Component = () => {
   const { qr } = useQRCode()
-  const isByteMode = qr.decodingMode === '0100'
   return (
     <main className="max-w-screen-md mx-auto pb-16">
       <Components.h1>二维码解剖学</Components.h1>
@@ -96,7 +95,7 @@ const Component = () => {
         <Components.h2>二维码解剖</Components.h2>
         <ReadingOrder />
         <EncodingMode />
-        {isByteMode && (
+        {qr.decodingMode !== 'Unknown' && (
           <>
             <DecodingLength />
             <DecodingContent />

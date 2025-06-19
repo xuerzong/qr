@@ -2,7 +2,7 @@ import Components from '..'
 import { QRCodeDecoder } from '../qr/qr-code-decoder'
 import { useQRCode } from '../qr/qr-code-provider'
 
-const decodingModes: Record<string, string> = {
+const decodingModeBitss: Record<string, string> = {
   '0001': '数字模式',
   '0010': '字母数字模式',
   '0100': '字节模式',
@@ -55,12 +55,12 @@ export const EncodingMode = () => {
           'separators',
           'darkModule',
         ]}
-        paths={['decodingMode', 'readOrder']}
+        paths={['decodingModeBits', 'readOrder']}
       />
       <Components.p>
         当前编码模式为
         <Components.strong>
-          {decodingModes[qr.decodingMode]}（{qr.decodingMode}）
+          {decodingModeBitss[qr.decodingModeBits]}（{qr.decodingModeBits}）
         </Components.strong>
         。
       </Components.p>
