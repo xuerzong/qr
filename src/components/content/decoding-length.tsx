@@ -4,15 +4,22 @@ import { useQRCode } from '../qr/qr-code-provider'
 
 export const DecodingLength = () => {
   const { qr } = useQRCode()
+  const decodingMode = qr.decodingMode
   return (
     <>
       <Components.h3>解码长度</Components.h3>
-      <Components.p>
-        二维码的解码长度是指二维码中存储的信息量，通常以字节为单位。不同的二维码版本和纠错级别会影响解码长度。了解解码长度对于设计和生成二维码非常重要，以确保二维码能够容纳所需的信息。
-      </Components.p>
-      <Components.p>
-        在实际应用中，解码长度可以通过二维码的版本号和纠错级别来计算。每个版本的二维码都有一个特定的最大容量，而纠错级别则会影响可用容量。
-      </Components.p>
+
+      {decodingMode === 'Numeric' && (
+        <Components.p>数字编码模式下，原始数据长度由10位二进制表示。</Components.p>
+      )}
+
+      {decodingMode === 'Bytes' && (
+        <Components.p>字节编码模式下，原始数据长度由8位二进表示。</Components.p>
+      )}
+
+      {decodingMode === 'Alphanumeric' && (
+        <Components.p>字母数字编码模式下，原始数据长度由9位二进制表示。</Components.p>
+      )}
 
       <QRCodeDecoder
         features={[

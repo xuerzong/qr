@@ -6,12 +6,28 @@ import { QRCode } from '@/lib/qr'
 
 export const DecodingContent = () => {
   const { qr } = useQRCode()
+  const decodingMode = qr.decodingMode
   return (
     <>
       <Components.h3>解码内容</Components.h3>
-      <Components.p>
-        二维码的解码内容包括多个方面，如定位标记、纠错级别、版本信息、数据编码等。了解这些内容有助于更好地理解二维码的结构和功能。
-      </Components.p>
+      {decodingMode === 'Bytes' && (
+        <Components.p>
+          字节编码模式下，二维码的内容是以字节（8位二进制）形式存储的，每个字节对应一个字符。
+        </Components.p>
+      )}
+
+      {decodingMode === 'Alphanumeric' && (
+        <Components.p>
+          字母数字编码模式下，二维码的内容是以字母数字（9位二进制）形式存储的，每个字符对应一对字母或数字。其中，字符集包括数字（0-9）、大写字母（A-Z）和一些特殊字符（空格、$、%、\*、+、-、.、/），按照他们在字符集中的顺序进行编码。如果只有1个字符，则对应6位二进制；如果有2个字符，则对应11位二进制。计算方式为：
+          <Components.strong>fisrtCharIndex * 45 + secondCharIndex。</Components.strong>
+        </Components.p>
+      )}
+
+      {decodingMode === 'Numeric' && (
+        <Components.p>
+          数字编码模式下，二维码的内容是以数字（10位二进制）形式存储的，每3个数字对应10位二进制。如果只有1个数字，则对应4位二进制；如果有2个数字，则对应7位二进制。
+        </Components.p>
+      )}
 
       <QRCodeDecoder
         features={[
