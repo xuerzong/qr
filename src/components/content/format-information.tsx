@@ -147,15 +147,6 @@ export const FormatInformation = () => {
 
         <Components.li>
           <Components.p>
-            <Components.strong>连续模块：</Components.strong>
-            逐行逐列检查二维码矩阵，连续5个相同色块
-            <Components.strong>+3分</Components.strong>，超过5个每增加一个
-            <Components.strong>+1分</Components.strong>。
-          </Components.p>
-        </Components.li>
-
-        <Components.li>
-          <Components.p>
             <Components.strong>大块区域：</Components.strong>
             每出现一个2x2的色块
             <Components.strong>+3分</Components.strong>。
